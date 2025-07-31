@@ -2,17 +2,348 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Data Visualization Project</title>
+  <title>Climate Change Visualization</title>
 </head>
-<body>
-  <p>Hello this is my data visualization project lol</p>
+<body style="margin: 0; font-family: sans-serif;">
 
+  <!-- Centered intro container -->
+  <div id="introContainer" style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <div style="text-align: center;">
+      <h1>Climate Change: A Rising Trend</h1>
+      <p>Explore how global temperatures have changed over time.</p>
+      <button id="startButton" style="padding: 10px 20px; font-size: 16px;">Start</button>
+    </div>
+  </div>
+
+  <!-- Load D3 -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script>
+<script>
+  function renderOverview() {
+  const width = 800;
+  const height = 500;
+  const margin = { top: 50, right: 40, bottom: 60, left: 60 };
 
-    
+  d3.select("#chartContainer").remove();
 
-    
-  </script>
+  // ⚙️ Create layout
+  const container = d3.select("body")
+    .append("div")
+    .attr("id", "chartContainer")
+    .style("display", "flex")
+    .style("flex-direction", "row")
+    .style("align-items", "center")
+    .style("justify-content", "center")
+    .style("gap", "40px")
+    .style("min-height", "100vh")
+    .style("box-sizing", "border-box")
+    .style("padding", "40px");
+
+  // 📊 Chart
+  const chartBox = container.append("div");
+
+  chartBox.append("h2")
+    .text("Yearly Land & Ocean Average Global Temperature (1850–2015)")
+    .style("margin", "0 0 10px 0")
+    .style("font-family", "sans-serif");
+
+  const svg = chartBox.append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+  const g = svg.append("g")
+    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  const innerWidth = width - margin.left - margin.right;
+  const innerHeight = height - margin.top - margin.bottom;
+
+  const x = d3.scaleTime().range([0, innerWidth]);
+  const y = d3.scaleLinear().range([innerHeight, 0]);
+
+  const xAxis = g.append("g")
+    .attr("transform", `translate(0, ${innerHeight})`)
+    .attr("class", "x-axis");
+
+  const yAxis = g.append("g")
+    .attr("class", "y-axis");
+
+  const line = d3.line()
+    .x(d => x(d.year))
+    .y(d => y(d.temp));
+
+  const path = g.append("path")
+    .attr("class", "line-path")
+    .attr("fill", "none")
+    .attr("stroke", "steelblue")
+    .attr("stroke-width", 1.5);
+
+  svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", height - 10)
+    .attr("text-anchor", "middle")
+    .text("Year");
+
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -height / 2)
+    .attr("y", 20)
+    .attr("text-anchor", "middle")
+    .text("Temperature (°C)");
+
+  // 📝 Annotations
+  const annotations = container.append("div")
+    .attr("id", "annotations")
+    .style("width", "300px")
+    .style("font-family", "sans-serif")
+    .style("font-size", "14px");
+
+  annotations.append("h3").text("📌 Key Annotations");
+
+  // ⏮️⏭️ Navigation buttons
+  const buttonContainer = chartBox.append("div")
+    .style("display", "flex")
+    .style("gap", "10px")
+    .style("margin-top", "10px");
+
+  buttonContainer.append("button")
+    .text("Previous")
+    .attr("id", "prevSceneButton");
+
+  buttonContainer.append("button")
+    .text("Next")
+    .attr("id", "nextSceneButton");
+
+  // 🎬 Scenes
+  const scenes = [
+    {
+    yearRange: [1850, 1900],
+    annotations: [{ year: 1850, text: "Industrial Revolution spreads to Europe & U.S." },
+  { year: 1865, text: "End of U.S. Civil War fuels rapid industrial growth" },
+  { year: 1870, text: "Second Industrial Revolution begins (steel, rail, oil)" },
+  { year: 1880, text: "Start of industrial CO₂ emission monitoring" },
+  { year: 1885, text: "Mass production of coal-powered machines expands" },
+  { year: 1890, text: "Global coal consumption reaches 500 million tonnes" }],
+    showCO2: true
+  },
+  {
+    yearRange: [1900, 1950],
+    annotations: [{ year: 1914, text: "WWI begins – Industrial output shifts to war production" },
+  { year: 1918, text: "End of WWI – Economic recovery begins" },
+  { year: 1930, text: "Great Depression causes global economic slowdown" },
+  { year: 1939, text: "WWII begins – Emissions rise from military industry" },
+  { year: 1945, text: "WWII ends – Post-war rebuilding boosts emissions" }],
+    showCO2: true
+  },
+  {
+    yearRange: [1950, 2015],
+    annotations: [
+      { year: 1950, text: "Post-war industrial boom starts" },
+      { year: 1965, text: "Automobile revolution drives global oil demand" },
+      { year: 1973, text: "Oil crisis briefly slows emissions, then rebounds" },
+      { year: 1985, text: "Asian manufacturing surge increases global CO₂" },
+      { year: 2001, text: "China joins WTO, industrial emissions skyrocket" },
+      { year: 2008, text: "Global recession causes temporary emissions dip" },
+      { year: 2015, text: "Record CO₂ emissions and warmest year to date" }
+    ],
+    showCO2: true
+  },
+  {
+    yearRange: [1850, 2015],
+    annotations: [
+      { year: 1850, text: "Industrial Revolution spreads to Europe & U.S." },
+      { year: 1870, text: "Second Industrial Revolution begins (steel, rail, oil)" },
+      { year: 1930, text: "Great Depression slows industrial output" },
+      { year: 1945, text: "WWII ends – Post-war rebuilding boosts emissions" },
+      { year: 1965, text: "Automobile revolution drives global oil demand" },
+      { year: 1973, text: "Oil crisis briefly slows emissions, then rebounds" },
+      { year: 1985, text: "Asian manufacturing surge increases global CO₂" },
+      { year: 2001, text: "China joins WTO, industrial emissions skyrocket" },
+      { year: 2008, text: "Global recession causes temporary emissions dip" },
+      { year: 2015, text: "Record CO₂ emissions and warmest year to date" }
+
+    ],
+    showCO2: true
+  }
+  ];
+
+  let sceneIndex = 0;
+  let yearlyData = [];
+  let co2Data = [];
+
+  function renderScene(index) {
+  const scene = scenes[index];
+  const [startYear, endYear] = scene.yearRange;
+
+  const filtered = yearlyData.filter(d =>
+    d.year.getFullYear() >= startYear && d.year.getFullYear() <= endYear
+  );
+
+    // ✅ Update chart title based on scene year range
+  chartBox.select("h2")
+  .text(`Yearly Land & Ocean Average Global Temperature (${startYear}–${endYear})`);
+
+
+  x.domain([new Date(startYear, 0, 1), new Date(endYear, 0, 1)]);
+  y.domain(d3.extent(filtered, d => d.temp)).nice();
+
+  svg.select(".x-axis").transition().call(d3.axisBottom(x));
+  svg.select(".y-axis").transition().call(d3.axisLeft(y));
+
+  svg.select(".line-path")
+    .datum(filtered)
+    .transition()
+    .duration(800)
+    .attr("d", line);
+
+  // If CO₂ scene, show second y-axis
+  if (scene.showCO2 && co2Data.length > 0) {
+    const co2Filtered = co2Data.filter(d =>
+      d.year.getFullYear() >= startYear && d.year.getFullYear() <= endYear
+    );
+
+    const y2 = d3.scaleLinear()
+      .domain(d3.extent(co2Filtered, d => d.co2)).nice()
+      .range([innerHeight, 0]);
+
+    // Right-side axis
+    svg.selectAll(".y-axis-right").remove(); // prevent duplicates
+    svg.append("g")
+      .attr("transform", `translate(${width - margin.right}, ${margin.top})`)
+      .attr("class", "y-axis-right")
+      .call(d3.axisRight(y2));
+
+    // CO₂ Line
+    svg.selectAll(".line-co2").remove(); // prevent duplicates
+    svg.append("path")
+      .datum(co2Filtered)
+      .attr("class", "line-co2")
+      .attr("fill", "none")
+      .attr("stroke", "red")
+      .attr("stroke-width", 1.5)
+      .attr("transform", `translate(${margin.left}, ${margin.top})`)
+      .attr("d", d3.line()
+        .x(d => x(d.year))
+        .y(d => y2(d.co2))
+      );
+      // Label for CO₂ emissions (right y-axis)
+    svg.append("text")
+      .attr("class", "co2-label")
+      .attr("transform", `translate(${width - 10}, ${margin.top - 10})`)
+      .attr("text-anchor", "end")
+      .style("font-family", "sans-serif")
+      .style("font-size", "12px")
+      .text("World CO₂ Emissions (Million Tonnes)");
+
+  } else {
+    svg.selectAll(".line-co2").remove();
+    svg.selectAll(".y-axis-right").remove();
+  }
+
+  // Update annotations
+  const box = d3.select("#annotations");
+  box.selectAll("div.annotation").remove();
+  scene.annotations.forEach(note => {
+    box.append("div")
+      .attr("class", "annotation")
+      .style("margin-bottom", "10px")
+      .html(`<strong>${note.year}:</strong> ${note.text}`);
+  });
+
+      // 👆 Add tooltips for hover interaction only in the final scene
+svg.selectAll(".dot").remove(); // Clear any old dots
+
+if (sceneIndex === scenes.length - 1) {
+  svg.selectAll(".dot")
+    .data(filtered)
+    .enter().append("circle")
+    .attr("class", "dot")
+    .attr("cx", d => x(d.year) + margin.left)
+    .attr("cy", d => y(d.temp) + margin.top)
+    .attr("r", 4)
+    .attr("fill", "steelblue")
+    .attr("opacity", 0.6)
+    .on("mouseover", function (event, d) {
+      const co2Match = co2Data.find(c => c.year.getFullYear() === d.year.getFullYear());
+      const co2Val = co2Match ? co2Match.co2.toFixed(1) : "N/A";
+
+      tooltip.style("display", "block")
+        .html(`<strong>Year:</strong> ${d.year.getFullYear()}<br>
+               <strong>Temp:</strong> ${d.temp.toFixed(2)}°C<br>
+               <strong>CO₂:</strong> ${co2Val} Mt`)
+        .style("left", `${event.pageX + 10}px`)
+        .style("top", `${event.pageY - 28}px`);
+    })
+    .on("mouseout", function () {
+      tooltip.style("display", "none");
+    });
+
+    // Tooltip container
+let tooltip = d3.select("body").select("#tooltip");
+if (tooltip.empty()) {
+  tooltip = d3.select("body")
+    .append("div")
+    .attr("id", "tooltip")
+    .style("position", "absolute")
+    .style("background", "rgba(255, 255, 255, 0.9)")
+    .style("padding", "8px")
+    .style("border", "1px solid #ccc")
+    .style("border-radius", "4px")
+    .style("font-size", "13px")
+    .style("pointer-events", "none")
+    .style("display", "none");
+}
+}
+
+  
+}
+
+  // 📊 Load and prepare data
+  d3.csv("GlobalTemperatures.csv").then(function (data) {
+  yearlyData = d3.rollups(
+    data.filter(d => d.dt && d.LandAndOceanAverageTemperature),
+    v => d3.mean(v, d => +d.LandAndOceanAverageTemperature),
+    d => new Date(d.dt).getFullYear()
+  )
+    .map(([year, temp]) => ({ year: new Date(year, 0, 1), temp }))
+    .sort((a, b) => a.year - b.year);
+
+  // ⬇️ Load CO₂ data from OWID
+  d3.csv("owid-co2-data.csv").then(function (co2Raw) {
+    co2Data = co2Raw
+      .filter(d => d.country === "World" && d.year && d.co2)
+      .map(d => ({
+        year: new Date(+d.year, 0, 1),
+        co2: +d.co2
+      }))
+      .sort((a, b) => a.year - b.year);
+
+    // Start rendering now that both datasets are loaded
+    renderScene(sceneIndex);
+
+    // Button interactions
+    d3.select("#nextSceneButton").on("click", () => {
+      if (sceneIndex < scenes.length - 1) {
+        sceneIndex++;
+        renderScene(sceneIndex);
+      }
+    });
+
+    d3.select("#prevSceneButton").on("click", () => {
+      if (sceneIndex > 0) {
+        sceneIndex--;
+        renderScene(sceneIndex);
+      }
+    });
+  });
+});
+}
+
+  // 🎯 Start button click handler
+  d3.select("#startButton").on("click", function () {
+    d3.select("#introContainer").remove();  // Hide intro section
+    renderOverview();                        // Draw the chart
+  });
+</script>
+
+
 </body>
 </html>
