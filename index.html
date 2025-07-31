@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Climate Change Visualization</title>
+  <title>Global Temperature & CO₂ Explorer</title>
 </head>
 <body style="margin: 0; font-family: sans-serif;">
 
@@ -10,7 +10,7 @@
   <div id="introContainer" style="display: flex; justify-content: center; align-items: center; height: 100vh;">
     <div style="text-align: center;">
       <h1>Climate Change: A Rising Trend</h1>
-      <p>Explore how global temperatures have changed over time.</p>
+      <p>Explore how rising CO₂ emissions correlate with global temperatures over time.</p>
       <button id="startButton" style="padding: 10px 20px; font-size: 16px;">Start</button>
     </div>
   </div>
@@ -42,7 +42,7 @@
   const chartBox = container.append("div");
 
   chartBox.append("h2")
-    .text("Yearly Land & Ocean Average Global Temperature (1850–2015)")
+    .text("Global Temperature and CO₂ Emissions (1850–2015)")
     .style("margin", "0 0 10px 0")
     .style("font-family", "sans-serif");
 
@@ -179,7 +179,7 @@
 
     // ✅ Update chart title based on scene year range
   chartBox.select("h2")
-  .text(`Yearly Land & Ocean Average Global Temperature (${startYear}–${endYear})`);
+  .text(`Global Temperature and CO₂ Emissions (${startYear}–${endYear})`);
 
 
   x.domain([new Date(startYear, 0, 1), new Date(endYear, 0, 1)]);
