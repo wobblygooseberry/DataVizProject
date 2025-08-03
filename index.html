@@ -96,7 +96,7 @@
     .style("font-family", "sans-serif")
     .style("font-size", "14px");
 
-  annotations.append("h3").text("📌 Key Annotations");
+  //annotations.append("h3").text("📌 Key Annotations");
 
   // ⏮️⏭️ Navigation buttons
   const buttonContainer = chartBox.append("div")
@@ -114,6 +114,11 @@
 
   // 🎬 Scenes
   const scenes = [
+    {
+    yearRange: [1850, 2015],
+    annotations: [],
+    showCO2: true
+    },
     {
     yearRange: [1850, 1900],
     annotations: [{ year: 1850, text: "Industrial Revolution spreads to Europe & U.S." },
@@ -240,18 +245,70 @@
 
   // Update annotations
   const box = d3.select("#annotations");
-  box.selectAll("div.annotation").remove();
-  scene.annotations.forEach(note => {
+  //box.selectAll("div.annotation").remove();
+  box.html(""); // Clear previous annotations
+
+  if (scene.annotations.length > 0) {
+    box.append("h3").text("📌 Key Annotations");
+    scene.annotations.forEach(note => {
     box.append("div")
       .attr("class", "annotation")
       .style("margin-bottom", "10px")
       .html(`<strong>${note.year}:</strong> ${note.text}`);
   });
+  } else {
+      box.append("h3")
+    .text("📈 Overview");
 
+      box.append("p")
+    .text("This overview shows the long-term trend in global temperature and CO₂ emissions from 1850 to 2015.");
+  }
       // 👆 Add tooltips for hover interaction only in the final scene
 svg.selectAll(".dot").remove(); // Clear any old dots
 
+if (sceneIndex === 0) {
+  svg.selectAll(".annotation-dot").remove();
+}
+/*
+if (sceneIndex < scenes.length - 1 && sceneIndex > 0) {
+  // Array of years to highlight from the annotations
+  const annotatedYears = scenes[sceneIndex].annotations.map(d => parseInt(d.year));
+
+  // Match each year to a data point in the current filtered data
+  const annotatedPoints = annotatedYears.map(y =>
+    filtered.find(p => p.year.getFullYear() === y)
+  ).filter(d => d); // filter out undefined if year not found
+
+  svg.selectAll(".annotation-dot").remove(); // remove old ones
+
+  svg.selectAll(".annotation-dot")
+    .data(annotatedPoints)
+    .enter().append("circle")
+    .attr("class", "annotation-dot")
+    .attr("cx", d => x(d.year) + margin.left)
+    .attr("cy", d => y(d.temp) + margin.top)
+    .attr("r", 4)
+    .attr("fill", "steelblue")
+    .attr("opacity", 0.8)
+    .on("mouseover", function (event, d) {
+  const year = d.year instanceof Date ? d.year : new Date(d.year, 0, 1);
+  const co2Match = co2Data.find(c => c.year.getFullYear() === year.getFullYear());
+  const co2Val = co2Match && co2Match.co2 ? co2Match.co2.toFixed(1) : "N/A";
+
+  tooltip.style("display", "block")
+    .html(`<strong>Year:</strong> ${year.getFullYear()}<br>
+           <strong>Temp:</strong> ${d.temp.toFixed(2)}°C<br>
+           <strong>CO₂:</strong> ${co2Val} Mt`)
+    .style("left", `${event.pageX + 10}px`)
+    .style("top", `${event.pageY - 28}px`);
+    })
+    .on("mouseout", function () {
+      tooltip.style("display", "none");
+    });
+}
+*/
 if (sceneIndex === scenes.length - 1) {
+  svg.selectAll(".annotation-dot").remove(); // remove old ones
   svg.selectAll(".dot")
     .data(filtered)
     .enter().append("circle")
@@ -260,7 +317,7 @@ if (sceneIndex === scenes.length - 1) {
     .attr("cy", d => y(d.temp) + margin.top)
     .attr("r", 4)
     .attr("fill", "steelblue")
-    .attr("opacity", 0.6)
+    .attr("opacity", 0.8)
     .on("mouseover", function (event, d) {
       const co2Match = co2Data.find(c => c.year.getFullYear() === d.year.getFullYear());
       const co2Val = co2Match ? co2Match.co2.toFixed(1) : "N/A";
@@ -276,6 +333,8 @@ if (sceneIndex === scenes.length - 1) {
       tooltip.style("display", "none");
     });
 
+
+    
     // Tooltip container
 let tooltip = d3.select("body").select("#tooltip");
 if (tooltip.empty()) {
